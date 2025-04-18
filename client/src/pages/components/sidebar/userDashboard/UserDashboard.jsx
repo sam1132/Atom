@@ -35,7 +35,7 @@ const UserDashboard = () => {
           <PiGear className="text-xl" />
         </div>
       </Link>
-      <Link to="/user/archive">
+      <Link to="/user/resources">
         <div className="hover:bg-[#2f184b] rounded-[7.5px] transition-all duration-250 flex items-center justify-between py-0 px-[10px] w-full h-10 cursor-pointer text-[#bbb] hover:text-[#eee]">
           <p className="text-sm font-semibold">Archive</p>
           <BsFolder2Open className="text-xl" />

@@ -18,7 +18,7 @@ import MindMuffins from "./pages/components/sidebar/userDashboard/MindMuffins";
 import DiscoverServer from "./pages/components/sidebar/DiscoverServer";
 import Docket from "./pages/components/sidebar/userDashboard/Docket";
 import Planner from "./pages/components/sidebar/userDashboard/Planner";
-import Archive from "./pages/components/sidebar/userDashboard/Archive";
+import Resources from "./pages/components/sidebar/userDashboard/Resources";
 
 function App() {
   return (
@@ -42,7 +42,7 @@ function App() {
                 <Route path="discover" element={<DiscoverServer />} />
 
                 <Route path="settings" element={<Settings />} />
-                <Route path="archive" element={<Archive />} />
+                <Route path="resources" element={<Resources />} />
                 <Route path="docket" element={<Docket />} />
                 <Route path="planner" element={<Planner />} />
                 <Route path="mind-muffins" element={<MindMuffins />} />
