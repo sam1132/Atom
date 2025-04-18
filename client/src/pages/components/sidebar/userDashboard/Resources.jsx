@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IoMdSearch, IoMdDocument } from "react-icons/io";
-import bannerImg from "../assets/banner.png";
+import bannerImg from "../../../../assets/banner.png";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { FaRegImages } from "react-icons/fa";
@@ -145,7 +145,7 @@ const Resources = () => {
   const paginationModel = { page: 0, pageSize: 5 };
   return (
     <>
-      <main className="pl-18 bg-slate-900 ">
+      <main className="h-full overflow-y-auto [&::-webkit-scrollbar]:hidden">
         <div className="relative ml-2">
           <IoMdSearch className="text-2xl text-black md:text-[1.7rem] absolute  top-5 left-5 md:top-6" />
           <input
@@ -171,35 +171,35 @@ const Resources = () => {
           My Storage
         </h1>
         <div className="flex md:flex-row flex-col justify-between gap-x-4 gap-y-4 mx-5 ">
-          <div className="p-4 bg-white md:h-32 md:w-72 rounded-md">
+          <div className="p-4 bg-white md:h-32 md:w-full rounded-md">
             <div className="bg-violet-200 h-10 w-10 flex items-center justify-center text-[1.3rem] text-violet-900 mb-2 rounded-full">
               {<IoMdDocument />}
             </div>
             <p className="text-xl text-gray-600 font-semibold">Documents</p>
             <p className="text-xl font-bold">67 Files</p>
           </div>
-          <div className="p-4 bg-white md:h-32 md:w-72 rounded-md">
+          <div className="p-4 bg-white md:h-32 md:w-full rounded-md">
             <div className="bg-blue-200 h-10 w-10 flex items-center justify-center text-[1.3rem] text-blue-900 mb-2 rounded-full">
               {<MdOutlineVideoLibrary />}
             </div>
             <p className="text-xl text-gray-600 font-semibold">Videos</p>
             <p className="text-xl font-bold">10 Files</p>
           </div>
-          <div className="p-4 bg-white md:h-32 md:w-72 rounded-md">
+          <div className="p-4 bg-white md:h-32 md:w-full rounded-md">
             <div className="bg-gray-200 h-10 w-10 flex items-center justify-center text-[1.3rem] text-gray-900 mb-2 rounded-full">
               {<FaRegImages />}
             </div>
             <p className="text-xl text-gray-600 font-semibold">Images</p>
             <p className="text-xl font-bold">30 Files</p>
           </div>
-          <div className="p-4 bg-white md:h-32 md:w-72 rounded-md">
+          <div className="p-4 bg-white md:h-32 md:w-full rounded-md">
             <div className="bg-blue-200 h-10 w-10 flex items-center justify-center text-[1.3rem] text-blue-950 mb-2 rounded-full">
               {<MdOutlineAudiotrack />}
             </div>
             <p className="text-xl text-gray-600 font-semibold">Audios</p>
             <p className="text-xl font-bold">5 Files</p>
           </div>
-          <div className="p-4 bg-white mb-5 md:h-32 md:w-72 rounded-md">
+          <div className="p-4 bg-white mb-5 md:h-32 md:w-full rounded-md">
             <div className="bg-green-200 h-10 w-10 flex items-center justify-center text-[1.3rem] text-green-900 mb-2 rounded-full">
               {<RiAppsFill />}
             </div>

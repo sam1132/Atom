@@ -102,7 +102,7 @@ const Sidebar = () => {
       >
         <div className="absolute inset-[10px] left-[0px] rounded-[10px] bg-[#2f184b]/37.5">
           {componentMap[activeComponent]}
-          {/* <nav className=" flex flex-col w-full py-[10px] px-[10px] gap-[5px]">
+          <nav className=" flex flex-col w-full py-[10px] px-[10px] gap-[5px]">
             <div className="hover:bg-[#2f184b] rounded-[7.5px] transition-all duration-250 flex items-center gap-2 py-0 px-[10px] w-full h-10 cursor-pointer text-[#bbb] hover:text-[#eee]">
               <TbHash  className="text-xl" />
               <p className="text-sm font-semibold">text-channel</p>
@@ -115,7 +115,7 @@ const Sidebar = () => {
               <TbVideoFilled className="text-xl" />
               <p className="text-sm font-semibold">video-channel</p>
             </div>
-          </nav> */}
+          </nav>
         </div>
       </div>
     </div>

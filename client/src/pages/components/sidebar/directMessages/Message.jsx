@@ -23,13 +23,13 @@ const Message = () => {
         </div>
 
         <div className="flex">
-          {/* <button className="border-0 cursor-pointer w-[45px] h-[45px] grid place-items-center text-[#bbb] hover:text-[#eee] text-2xl">
+          <button className="border-0 cursor-pointer w-[45px] h-[45px] grid place-items-center text-[#bbb] hover:text-[#eee] text-2xl">
             <PiPhoneCallFill />
           </button>
 
           <button className="border-0 cursor-pointer w-[45px] h-[45px] grid place-items-center text-[#bbb] hover:text-[#eee] text-2xl">
             <TbVideoFilled />
-          </button> */}
+          </button>
 
           <div className="flex items-center justify-center px-[5px] h-[45px] rounded-full bg-[#2f184b]/37.5">
             <div className="flex flex-row justify-center gap-[7.5px] w-[75px]">
