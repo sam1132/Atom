@@ -1,10 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { toastStyle } from "./utils/toastStyle";
-
 import { AuthProvider } from "./pages/auth/Context";
-import ProtectedRoute from "./pages/auth/ProtectedRoute";
-
 import Stars from "./pages/layout/Background";
 import Signup from "./pages/auth/Signup";
 import SetupProfile from "./pages/auth/SetupProfile";
@@ -18,13 +15,13 @@ import MindMuffins from "./pages/components/sidebar/userDashboard/MindMuffins";
 import DiscoverServer from "./pages/components/sidebar/DiscoverServer";
 import Docket from "./pages/components/sidebar/userDashboard/Docket";
 import Planner from "./pages/components/sidebar/userDashboard/Planner";
+import { ProtectedProfileRoute } from "./pages/auth/ProtectedProfileRoute";
+import { ProtectedAuthRoute } from "./pages/auth/ProtectedAuthRoute";
 import Resources from "./pages/components/sidebar/userDashboard/Resources";
 
 function App() {
   return (
     <div className="bg-[#150A26] p-[12.5px] h-screen">
-      {/* 0A0412 */}
-      {/* 02000D */}
       <Stars />
       <AuthProvider>
         <Toaster {...toastStyle} />
@@ -33,14 +30,16 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route element={<ProtectedRoute />}>
+
+            <Route element={<ProtectedAuthRoute />}>
               <Route path="/setup-profile" element={<SetupProfile />} />
+            </Route>
+
+            <Route element={<ProtectedProfileRoute />}>
               <Route path="/user" element={<User />}>
                 <Route index element={<Explore />} />
                 <Route path="message" element={<Message />} />
-
                 <Route path="discover" element={<DiscoverServer />} />
-
                 <Route path="settings" element={<Settings />} />
                 <Route path="resources" element={<Resources />} />
                 <Route path="docket" element={<Docket />} />
@@ -54,5 +53,4 @@ function App() {
     </div>
   );
 }
-
 export default App;

@@ -23,6 +23,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [backendUser, setBackendUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   async function signup(email, password) {
@@ -69,21 +70,31 @@ export function AuthProvider({ children }) {
 
   async function sendUserToBackend(user) {
     const token = await user.getIdToken();
-    const res = await fetch("http://localhost:3000/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ uid: user.uid, email: user.email }),
-    });
-    const payload = await res.json();
-    console.log("↪ backend replied", res.status, payload);
-    if (!res.ok) {
-      if (res.status === 409 && payload.error.includes("already exists")) {
-        return;
+    try {
+      const res = await fetch("http://localhost:3000/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ uid: user.uid, email: user.email }),
+      });
+      const payload = await res.json();
+      console.log("↪ backend replied", res.status, payload);
+
+      if (res.ok) {
+        setBackendUser(payload);
+      } else {
+        if (res.status === 409 && payload.error?.includes("already exists")) {
+          console.warn("User already exists, skipping...");
+        } else {
+          throw new Error(payload.error || "Unknown error from backend");
+        }
       }
-      throw new Error(payload.error);
+      return payload;
+    } catch (error) {
+      console.error("Failed to send user to backend:", error.message || error);
+      throw error;
     }
   }
 
@@ -100,6 +111,8 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    backendUser,
+    setBackendUser,
     signup,
     login,
     logout,

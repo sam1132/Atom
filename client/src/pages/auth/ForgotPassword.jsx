@@ -41,7 +41,6 @@ const ForgotPassword = () => {
         <SiAuthelia className="!h-[62.5px] !w-[62.5px] text-purple-900" />
       </div>
       <div
-        // bg-white/5
         className="flex flex-col items-center gap-[25px] w-[325px] bg-[#000000]/67.5 rounded-[10px] pt-[67.5px] pb-[18.75px]"
       >
         <p className="text-[#bbb] text-xs font-bold ">
