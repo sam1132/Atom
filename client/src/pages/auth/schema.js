@@ -19,7 +19,7 @@ export const SetupSchema = z.object({
     .min(3, { message: "At least 3 characters" })
     .max(12, { message: "At most 12 characters" })
     .regex(/^[A-Za-z]+$/, {
-      message: "No spaces, numbers, or speacial characters",
+      message: "No spaces, numbers, or special characters",
     }),
 });
 
