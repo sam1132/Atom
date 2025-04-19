@@ -12,22 +12,37 @@ import {
 } from "@mui/material";
 import React, { useState, forwardRef } from "react";
 import { BsSearch } from "react-icons/bs";
-
+import { useAuth } from "../../../auth/Context";
+import axios from "axios";
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const DirectMessages = () => {
+  const { currentUser } = useAuth();
   const [open, setOpen] = useState(false);
   const [popup, setPopup] = useState(false);
   const [Search, setSearch] = useState("");
+  const [chat, setChat] = useState([]);
 
-  const handleFind = (e) => {
+  const handleFind = async (e) => {
     e.preventDefault();
-    
-    console.log("Searching for:", Search);
-    setSearch("");
-  }
+    try {
+      const token = await currentUser.getIdToken();
+      const response = await axios.get(
+        `http://localhost:3000/api/users/search/${Search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setChat(response.data);
+      setSearch("");
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -43,7 +58,10 @@ const DirectMessages = () => {
         {popup && (
           <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50">
             <div className="relative flex flex-col items-center justify-center w-full max-w-[625px] gap-[10px] p-[18.75px] pt-[25px] bg-[#2f184b]/37.5 rounded-[10px]">
-              <RxCross2 className="absolute top-[12.5px] right-[12.5px] cursor-pointer text-[#bbb] hover:text-[#ddd] text-md max-[500px]:text-sm" />
+              <RxCross2
+                className="absolute top-[12.5px] right-[12.5px] cursor-pointer text-[#bbb] hover:text-[#ddd] text-md max-[500px]:text-sm"
+                onClick={() => setPopup(false)}
+              />
               <p className="text-[#eee] text-xl max-[500px]:text-[12.5px] font-bold ">
                 Connect with Others
               </p>
@@ -78,12 +96,19 @@ const DirectMessages = () => {
       </div>
       <nav className=" flex flex-col w-full py-0 px-[10px] gap-[5px]">
         <div className="hover:bg-[#2f184b] rounded-[7.5px] transition-all duration-250 flex items-center justify-between py-0 px-[10px] w-full h-10 text-[#bbb] hover:text-[#eee] text-sm">
-          <Link to="/user/message">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <img src="/icon.svg" className="w-6.25" />
-              <p className="font-semibold">Jaspreet</p>
-            </div>
-          </Link>
+          {chat.map((chatItem) => (
+            <Link
+              key={chatItem.shortId}
+              to={`/user/message/${chatItem.shortId}`}
+            >
+              <div className="flex items-center gap-2 cursor-pointer">
+                <img src={chatItem.avatar} className="w-6.25" alt="icon" />
+                <p className="font-semibold">
+                  {chatItem.displayName || "Unknown"}
+                </p>
+              </div>
+            </Link>
+          ))}
           <div>
             <RxCross2
               className="cursor-pointer"

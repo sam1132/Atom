@@ -75,7 +75,7 @@ router.put("/:uid", async (req, res) => {
   }
 });
 
-router.post("/search/:id", async (req, res) => {
+router.get("/search/:id", async (req, res) => {
   const id = req.params.id;
   const token = req.headers.authorization?.split(" ")[1];
   try {
@@ -85,7 +85,7 @@ router.post("/search/:id", async (req, res) => {
     }
     const users = await User.find({
       $or: [
-        { shortId: { $regex: search, $options: "i" } },
+        { shortId: { $regex: id, $options: "i" } },
       ],
     }).limit(10);
     res.status(200).json(users);

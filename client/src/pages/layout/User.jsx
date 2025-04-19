@@ -1,9 +1,26 @@
 import { Outlet } from "react-router-dom";
-
+import { useEffect } from "react";
 import Sidebar from "./Sidebar";
+import { auth } from "../auth/firebase"; // your config
+import { onAuthStateChanged } from "firebase/auth";
 
 
 const User = () => {
+  
+useEffect(() => {
+    getToken();
+  }, []);
+
+const getToken = () => {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const token = await user.getIdToken();
+      console.log("Your Firebase token:", token);
+    } else {
+      console.log("User not logged in");
+    }
+  });
+};
 
   return (
     <div className="flex h-full">

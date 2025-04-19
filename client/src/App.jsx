@@ -38,7 +38,7 @@ function App() {
             <Route element={<ProtectedProfileRoute />}>
               <Route path="/user" element={<User />}>
                 <Route index element={<Explore />} />
-                <Route path="message" element={<Message />} />
+                <Route path="message/:shortId" element={<Message />} />
                 <Route path="discover" element={<DiscoverServer />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="resources" element={<Resources />} />
