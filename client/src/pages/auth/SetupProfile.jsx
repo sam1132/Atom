@@ -4,13 +4,14 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { FaPlus } from "react-icons/fa6";
+import { useAuth } from "./Context";
 
 const SetupProfile = () => {
+  const { currentUser, setBackendUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(
-    "https://giffiles.alphacoders.com/424/4244.gif"
+    "https://i.pinimg.com/236x/08/f6/4a/08f64a7cb64b67167d6b5e75429b26bb.jpg"
   );
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
@@ -38,6 +39,42 @@ const SetupProfile = () => {
     toast.dismiss();
     try {
       setLoading(true);
+      let avatarUrl = imagePreview;
+      if (fileInputRef.current?.files?.[0]) {
+        const token = await currentUser.getIdToken();
+        const formData = new FormData();
+        formData.append("image", fileInputRef.current.files[0]);
+
+        const uploadRes = await fetch("http://localhost:3000/api/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+        const { url } = await uploadRes.json();
+        avatarUrl = url;
+      }
+      const updateRes = await fetch(
+        `http://localhost:3000/api/users/${currentUser.uid}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${await currentUser.getIdToken()}`,
+          },
+          body: JSON.stringify({
+            displayName: data.name,
+            avatar: avatarUrl,
+          }),
+        }
+      );
+      if (!updateRes.ok) {
+        const errorData = await updateRes.json();
+        throw new Error(errorData.error || "Profile update failed");
+      }
+      const updatedUser = await updateRes.json();
+      setBackendUser(updatedUser);
       toast.success("Explore What's Waiting for You!");
       navigate("/user");
     } catch (error) {
@@ -50,7 +87,10 @@ const SetupProfile = () => {
   return (
     <div className="relative flex flex-col items-center justify-center h-full w-full">
       <div className="flex flex-col items-center gap-[37.5px] w-[325px] bg-[#000000]/67.5 rounded-[10px] p-[18.75px]">
-        <p className="text-[#bbb] text-xs font-bold ">Let's Get You Set Up</p>
+        <p className="text-[#bbb] text-xs font-bold uppercase">
+          Let's Get You Set Up
+        </p>
+
         <div className="relative w-[125px] h-[125px] rounded-full bg-[#2f184b]/25 border-2 border-dashed border-[#2f184b]">
           <img
             src={imagePreview}
@@ -71,6 +111,7 @@ const SetupProfile = () => {
             className="hidden"
           />
         </div>
+
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-full flex flex-col items-center gap-[18.75px]"
@@ -86,12 +127,17 @@ const SetupProfile = () => {
               {errors.name.message}
             </p>
           )}
+
           <button
             type="submit"
             disabled={loading}
             className="cursor-pointer flex items-center justify-center h-[37.5px] w-full text-[#bbb] hover:text-[#ddd] bg-purple-950/75 hover:bg-purple-950 rounded-[7.5px]"
           >
-            <p className="text-xs font-bold">Save & Continue</p>
+            {loading ? (
+              <div className="h-[20px] w-[20px] border-3 border-t-white/75 border-black/25 rounded-full animate-spin"></div>
+            ) : (
+              <p className="text-xs font-bold">Save & Continue</p>
+            )}
           </button>
         </form>
       </div>
