@@ -1,6 +1,7 @@
 import { FaPlus } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -28,6 +29,25 @@ const DirectMessages = () => {
   const [chat, setChat] = useState([]);
   const { setActiveChatUser } = useChat();
 
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const token = await currentUser.getIdToken();
+        const res = await axios.get("http://localhost:3000/api/users/connections", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setChat(res.data);
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      }
+    };
+  
+    fetchChats();
+  }, []);
+  
+
   const handleFind = async (e) => {
     e.preventDefault();
     try {
@@ -40,7 +60,19 @@ const DirectMessages = () => {
           },
         }
       );
-      setChat(response.data);
+     const foundUser = response.data[0]; 
+
+      if (!foundUser) return;
+      const res = await axios.post(
+        "http://localhost:3000/api/users/connect",
+        { receiverId: foundUser.shortId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setChat(res.data);
       setSearch("");
     } catch (error) {
       console.error("Error fetching user:", error);
