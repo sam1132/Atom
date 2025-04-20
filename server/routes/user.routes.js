@@ -153,6 +153,6 @@ router.get("/connections", async (req, res) => {
 });
 
 router.patch("/update/displayName", updateDisplayName);
-router.delete("/delete", deleteAccount)
+router.delete("/:uid", deleteAccount)
 
 export default router;

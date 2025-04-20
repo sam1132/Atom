@@ -1,27 +1,82 @@
-import ChangeAvatar from "./ChangeAvatar";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
-import axios from "axios";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { TbCopy, TbProgressCheck } from "react-icons/tb";
 
+import { auth } from "../../../auth/firebase";
+import ChangeAvatar from "./ChangeAvatar";
+import DeleteAccount from "./DeleteAccount";
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  DialogContentText,
-} from "@mui/material";
-
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
+import { SetupSchema } from "../../../auth/schema";
 import { useAuth } from "../../../auth/Context";
-import { red } from "@mui/material/colors";
 
 const Settings = () => {
   const { currentUser, backendUser, setBackendUser } = useAuth();
   const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [displayName, setDisplayName] = useState("");
-  const [open, setOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(SetupSchema),
+    defaultValues: {
+      name: backendUser?.displayName || "",
+    },
+  });
+
+  const getAuthProvider = () => {
+    if (!currentUser) return "password";
+    const providers = currentUser.providerData.map((p) => p.providerId);
+    return providers.includes("google.com")
+      ? "google.com"
+      : providers.includes("github.com")
+      ? "github.com"
+      : "password";
+  };
+
+  const handleNameUpdate = async (data) => {
+    if (!data.name || data.name === backendUser?.displayName) return;
+    try {
+      setLoading(true);
+      const token = await currentUser.getIdToken();
+      const updateRes = await fetch(
+        `http://localhost:3000/api/users/${currentUser.uid}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            displayName: data.name,
+          }),
+        }
+      );
+      if (!updateRes.ok) {
+        const errorData = await updateRes.json();
+        throw new Error(errorData.error || "Failed to update name");
+      }
+      const updatedUser = await updateRes.json();
+      setBackendUser(updatedUser);
+      toast.success("Display name updated successfully!");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRemoveAvatar = async () => {
     try {
       setLoading(true);
@@ -50,66 +105,43 @@ const Settings = () => {
       setLoading(false);
     }
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleUpdateDisplayName = async () => {
-    try {
-      if (!displayName?.trim()) {
-        toast.error("Display name cannot be empty.");
-        return;
-      }
-      const token = await currentUser.getIdToken();
-      const response = await axios.patch(
-        "http://localhost:3000/api/users/update/displayName",
-        {
-          displayName: displayName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setBackendUser((prevUser) => ({
-        ...prevUser,
-        displayName: response.data.displayName,
-      }));
-      const updatedUser = response.data;
 
-      if (updatedUser && updatedUser.displayName === displayName) {
-        toast.success("Display name updated successfully!");
-      } else {
-        toast.error("Display name update failed or no changes detected.");
-      }
-      setDisplayName("");
-    } catch (error) {
-      console.error("Error updating display name:", error);
-      toast.error("Failed to update display name");
-    }
-  };
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = async (password, providerType) => {
     try {
-      const token = await currentUser.getIdToken();
-      const response = await axios.delete(
-        `http://localhost:3000/api/users/delete`,
+      setLoading(true);
+      let credential;
+      if (providerType === "google") {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        credential = GoogleAuthProvider.credentialFromResult(result);
+      } else if (providerType === "github") {
+        const provider = new GithubAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        credential = GithubAuthProvider.credentialFromResult(result);
+      } else {
+        credential = EmailAuthProvider.credential(currentUser.email, password);
+      }
+      await reauthenticateWithCredential(currentUser, credential);
+      await currentUser.delete();
+      const deleteRes = await fetch(
+        `http://localhost:3000/api/users/${currentUser.uid}`,
         {
+          method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${await currentUser.getIdToken()}`,
           },
         }
       );
-      if (response.status === 200) {
-        toast.success("Account deleted successfully!");
-        setOpen(false);
-      } else {
-        toast.error("Failed to delete account");
-      }
+      if (!deleteRes.ok) throw new Error("Failed to delete account data");
+      toast.success("Account deleted successfully!");
+      setTimeout(() => (window.location.href = "/login"), 1500);
     } catch (error) {
-      console.error("Error deleting account:", error);
-      toast.error("Failed to delete account");
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+      setShowDeleteModal(false);
     }
-  }
+  };
 
   const handleCopyShortId = () => {
     navigator.clipboard.writeText(backendUser?.shortId);
@@ -126,21 +158,33 @@ const Settings = () => {
           <p className="text-[#bbb] text-sm max-[625px]:text-xs font-bold ">
             Display Name
           </p>
-          <div className="flex items-center w-full gap-[7.5px]">
+          <form
+            onSubmit={handleSubmit(handleNameUpdate)}
+            className="flex items-center w-full gap-[7.5px]"
+          >
             <input
               type="text"
               placeholder={backendUser?.displayName}
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+              {...register("name")}
               className="h-[37.5px] w-full px-3 py-3 rounded-[10px] bg-[#2f184b]/37.5 border-[1px] border-[#2f184b]/75 focus:outline-none text-sm font-normal text-[#eee]"
             />
-            <div
+            <button
+              type="submit"
+              disabled={loading}
               className="flex items-center justify-center h-[37.5px] min-w-[37.5px] w-[37.5px] shrink-0 rounded-[10px] text-xl text-[#bbb] hover:text-[#eee] bg-purple-950/75 hover:bg-purple-950 over"
-              onClick={handleUpdateDisplayName}
             >
-              <TbProgressCheck />
-            </div>
-          </div>
+              {loading ? (
+                <div className="h-[20px] w-[20px] border-3 border-t-white/75 border-black/25 rounded-full animate-spin"></div>
+              ) : (
+                <TbProgressCheck />
+              )}
+            </button>
+          </form>
+          {errors.name && (
+            <p className="text-red-600 text-[12.5px] font-semibold w-full px-1 mt-[-10px]">
+              {errors.name.message}
+            </p>
+          )}
 
           <p className="text-[#bbb] text-sm max-[625px]:text-xs font-bold ">
             Avatar
@@ -169,7 +213,7 @@ const Settings = () => {
           )}
         </div>
 
-        <div className="relative w-full flex flex-col gap-[5px] bg-[#2f184b]/37.5 rounded-[10px] border-[1px] border-[#2f184b]/75">
+        <div className="relative h-full w-full flex flex-col gap-[5px] bg-[#2f184b]/37.5 rounded-[10px] border-[1px] border-[#2f184b]/75">
           <img
             src={backendUser?.avatar}
             alt={backendUser?.displayName}
@@ -194,66 +238,20 @@ const Settings = () => {
       </div>
       <div className="mt-auto max-[625px]:mt-0 flex flex-col justify-center gap-[10px] w-full text-sm max-[625px]:text-xs">
         <button
-          // disabled={loading}
-          onClick={() => setOpen(true)}
+          onClick={() => setShowDeleteModal(true)}
           className="cursor-pointer flex items-center justify-center h-[37.5px] w-full rounded-[7.5px] text-red-600/75 hover:text-red-600 bg-white/5"
         >
           <p className="text-xs font-bold">Delete Account</p>
         </button>
+        {showDeleteModal && (
+          <DeleteAccount
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteAccount}
+            loading={loading}
+            provider={getAuthProvider()}
+          />
+        )}
       </div>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle
-          id="alert-dialog-title"
-          className="text-lg font-semibold text-white bg-[#1e1b2e] px-6 pt-4 pb-2"
-        >
-          Are you sure you want to delete your account?
-        </DialogTitle>
-
-        <DialogContent className="bg-[#1e1b2e] px-6 pb-4">
-          <DialogContentText
-            id="alert-dialog-description"
-            sx={{color: "#eee"}}
-          >
-            Deleting your account will remove all your data, including your
-            profile, messages, and any other associated information.
-            <br />
-            <strong className="text-red-500">
-              This action cannot be undone.
-            </strong>
-            All your data will be permanently removed from our servers.
-          </DialogContentText>
-        </DialogContent>
-
-        <DialogActions className="bg-[#1e1b2e] px-6 pb-4">
-          <Button
-            onClick={handleClose}
-            className="text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-1 rounded-md"
-          >
-            Cancel
-          </Button>
-          <Button
-            autoFocus
-            sx={{
-              color: "#fff",
-              px: "10px", 
-              py: "5px", 
-              borderRadius: "5px",
-              "&:hover": {
-                backgroundColor: "#f400081a",
-                color:'#f40008'
-              },
-            }}
-            
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };
