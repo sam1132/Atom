@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 
 import admin from "../config/firebase-admin.js";
 import { User } from "../models/user.model.js";
+import { deleteAccount, updateDisplayName } from "../Controller/User.conntroller.js";
 
 const router = express.Router();
 
@@ -151,5 +152,7 @@ router.get("/connections", async (req, res) => {
   }
 });
 
+router.patch("/update/displayName", updateDisplayName);
+router.delete("/delete", deleteAccount)
 
 export default router;
