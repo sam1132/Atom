@@ -29,6 +29,15 @@ const userSchema = new mongoose.Schema(
       default:
         "https://i.pinimg.com/236x/08/f6/4a/08f64a7cb64b67167d6b5e75429b26bb.jpg",
     },
+    connections:{
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [],
+    }
   },
   {
     timestamps: true,

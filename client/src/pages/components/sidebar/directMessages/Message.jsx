@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { BsEmojiLaughingFill } from "react-icons/bs";
 import { FaCirclePlus } from "react-icons/fa6";
 import { HiGif } from "react-icons/hi2";
@@ -10,7 +10,23 @@ import { ImPhoneHangUp } from "react-icons/im";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import { GoFileSubmodule } from "react-icons/go";
 import Chat from "./Chat";
+
+import { useChat } from "../../../../Context/ChatContext";
 const Message = () => {
+  const { activeChatUser } = useChat();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    if (activeChatUser) {
+      setUserData(activeChatUser);
+    }
+  }, [activeChatUser]);
+  {
+    console.log("Active Chat User:", activeChatUser);
+  }
+  {
+    console.log("Active Chat data:", userData);
+  }
   const fileInputRef = useRef(null);
   const actions = [
     {
@@ -33,17 +49,26 @@ const Message = () => {
   return (
     <div className="absolute top-0 bottom-0 transition-all duration-250 flex flex-col p-[15px] w-full">
       <div className="h-[45px] w-full rounded-[10px] flex items-center">
-        <div className="flex-1 flex items-center gap-3">
-          <img
-            src="/image.png"
-            alt="atom logo"
-            className="w-[33.75px] h-[33.75px] border-0 opacity-67.5 rounded-full transition-all duration-250"
-          />
-          <p className="p-0 text-sm font-bold cursor-pointer text-[#bbb] hover:text-[#eee]">
-            Jaspreet
-            {/* username */}
-          </p>
-        </div>
+        {userData ? (
+          <div className="flex-1 flex items-center gap-3">
+            <img
+              src={userData.avatar}
+              alt="useravatar"
+              className="w-[33.75px] h-[33.75px] border-0 opacity-67.5 rounded-full transition-all duration-250"
+            />
+            <p className="p-0 text-sm font-bold cursor-pointer text-[#bbb] hover:text-[#eee]">
+              {userData.displayName} {/* username */}
+              {/* username */}
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className="p-0 text-sm font-bold cursor-pointer text-[#bbb] hover:text-[#eee]">
+              No user selected
+            </p>
+          </div>
+        )}
+
         {/*   Call and video chat action start */}
         <div className="flex">
           {isCallActive ? (
