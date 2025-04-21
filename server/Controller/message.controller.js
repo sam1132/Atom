@@ -1,16 +1,12 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
-import admin from "../config/firebase-admin.js";
 import { User } from "../models/user.model.js";
 export const sendMessage = async (req, res) => {
     const { id } = req.params;
     const { message } = req.body;
     
     try {
-        const token = req.headers.authorization?.split(" ")[1];
-        const decoded = await admin.auth().verifyIdToken(token);
-        const currentUserId = decoded.uid;
-        const currentUser = await User.findOne({ uid: currentUserId });
+       const currentUser = req.currentUser;
         const senderId = currentUser._id;
         if (!currentUser) {
             return res.status(404).json({ error: "User not found" });
