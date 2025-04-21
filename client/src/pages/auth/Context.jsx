@@ -148,7 +148,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = {
-    currentUser,
+    currentUser, 
+    // what is the current user in firebase it is not the backend user  it is not giving the 
+    // mongo object id and other details and also it is not the upadted user
     backendUser,
     setBackendUser,
     signup,

@@ -34,3 +34,28 @@ export const sendMessage = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to send message' });
     }
 }
+
+export const getMessage = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const currentUser = req.currentUser;
+        const senderId = currentUser._id;
+        if (!currentUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const receiverUser = await User.findOne({ shortId: id });
+        if (!receiverUser) {
+            return res.status(404).json({ error: "Receiver user not found" });
+        }
+        const receiverId = receiverUser._id;
+        const conversation = await Conversation.findOne({ members: { $all: [senderId, receiverId] } }).populate('messages');
+        if (!conversation) {
+            return res.status(201).json([]);
+        }
+        const messages =  conversation.messages
+        res.status(200).json(messages);
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch messages' });
+    }
+}

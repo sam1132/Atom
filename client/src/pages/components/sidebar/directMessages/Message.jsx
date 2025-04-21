@@ -1,6 +1,5 @@
 import React, { useState, useRef,useEffect } from "react";
 import { BsEmojiLaughingFill } from "react-icons/bs";
-import { FaCirclePlus } from "react-icons/fa6";
 import { HiGif } from "react-icons/hi2";
 import { PiPhoneCallFill, PiMicrophoneSlashFill } from "react-icons/pi";
 import { TbVideoFilled } from "react-icons/tb";
@@ -21,12 +20,6 @@ const Message = () => {
       setUserData(activeChatUser);
     }
   }, [activeChatUser]);
-  {
-    console.log("Active Chat User:", activeChatUser);
-  }
-  {
-    console.log("Active Chat data:", userData);
-  }
   const fileInputRef = useRef(null);
   const actions = [
     {
@@ -154,7 +147,7 @@ const Message = () => {
         <input
           type="text"
           className="flex-1 py-3 border:none focus:outline-none text-sm font-normal text-[#eee] bg-transparent"
-          placeholder="Message @Jaspreet"
+          placeholder={`message @ ${userData ? userData.displayName : ""}`}
         />
         {/* Bottom message send bar */}
         <div className="flex ml-[11.25px]">
