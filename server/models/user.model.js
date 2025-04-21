@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema(
         },
       ],
       default: [],
-    }
+    },
+    files: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }]
   },
   {
     timestamps: true,

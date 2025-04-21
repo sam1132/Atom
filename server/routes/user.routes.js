@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 
 import admin from "../config/firebase-admin.js";
 import { User } from "../models/user.model.js";
-import { deleteAccount, updateDisplayName } from "../Controller/User.conntroller.js";
+import { deleteAccount, updateDisplayName } from "../Controller/User.controller.js";
 
 const router = express.Router();
 

@@ -154,7 +154,7 @@ const Settings = () => {
         Profile and Account Settings
       </div>
       <div className="flex items-center w-full gap-[15px] max-[625px]:flex-col">
-        <div className="flex flex-col justify-center w-full gap-[10px]">
+        <div className="flex flex-col justify-between h-full w-full gap-[10px]">
           <p className="text-[#bbb] text-sm max-[625px]:text-xs font-bold ">
             Display Name
           </p>
