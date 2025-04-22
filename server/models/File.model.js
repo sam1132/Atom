@@ -20,7 +20,7 @@ const fileSchema = new mongoose.Schema({
   size: Number, 
   uploadedAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
 },{timestamps:true});
 

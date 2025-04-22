@@ -14,7 +14,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     message: { type: String, required: true },
-    file: [
+    files: [
       { type: mongoose.Schema.Types.ObjectId, ref: File, default: [] },
     ],
   },

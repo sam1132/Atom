@@ -11,9 +11,14 @@ import { GoFileSubmodule } from "react-icons/go";
 import Chat from "./Chat";
 
 import { useChat } from "../../../../Context/ChatContext";
+import { useAuth } from "../../../auth/Context";
+import axios from "axios";
 const Message = () => {
   const { activeChatUser } = useChat();
   const [userData, setUserData] = useState(null);
+  const [message, setMessage] = useState("");
+  const { currentUser } = useAuth();
+  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     if (activeChatUser) {
@@ -30,15 +35,44 @@ const Message = () => {
       },
     },
   ];
+
+    const sendmessage = async() => { 
+      const formdata = new FormData();
+      formdata.append("message", message);
+      files.forEach((file) => {
+        formdata.append("files", file);
+      });
+    try{
+      const token = await currentUser.getIdToken();
+      for (let [key, value] of formdata.entries()) {
+        console.log(`${key}:`, value);
+      }
+      const response = await axios.post(`http://localhost:3000/api/message/send/${activeChatUser.shortId}`, 
+      formdata,
+         {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMessage("");
+      setFiles([]); 
+      // setMessage((prevMessages) => [...prevMessages, response.data]); returning object [object]
+
+    }
+    catch(err){
+      console.log(err); 
+      }
+    };
   const [isCallActive, setIsCallActive] = useState(false);
   const [isVideoActive, setIsVideoActive] = useState(false);
 
-  const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length > 0) {
-      onFilesSelected(files);
-    }
-  };
+ const handleFileChange = (event) => {
+  const selected = Array.from(event.target.files);
+  console.log(selected); // Log the selected files
+  if (selected.length > 0) {
+    setFiles(selected);
+  }
+};
   return (
     <div className="absolute top-0 bottom-0 transition-all duration-250 flex flex-col p-[15px] w-full">
       <div className="h-[45px] w-full rounded-[10px] flex items-center">
@@ -57,7 +91,7 @@ const Message = () => {
         ) : (
           <div>
             <p className="p-0 text-sm font-bold cursor-pointer text-[#bbb] hover:text-[#eee]">
-              No user selected
+              select a user to chat with
             </p>
           </div>
         )}
@@ -135,7 +169,7 @@ const Message = () => {
         </SpeedDial>
 
         {/* Hidden file input for multiple files */}
-        <input
+       <input
           type="file"
           ref={fileInputRef}
           style={{ display: "none" }}
@@ -148,6 +182,17 @@ const Message = () => {
           type="text"
           className="flex-1 py-3 border:none focus:outline-none text-sm font-normal text-[#eee] bg-transparent"
           placeholder={`message @ ${userData ? userData.displayName : ""}`}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); 
+              if (message.trim() !== "") {
+                sendmessage(); 
+              }
+              setMessage(""); 
+            }
+          }}
         />
         {/* Bottom message send bar */}
         <div className="flex ml-[11.25px]">
@@ -157,7 +202,7 @@ const Message = () => {
           <button className="border-0 cursor-pointer w-[45px] h-[45px] grid place-items-center text-[#bbb] hover:text-yellow-500 text-lg">
             <BsEmojiLaughingFill />
           </button>
-          <button className="border-0 cursor-pointer h-[45px] grid place-items-center text-[#bbb] hover:text-[#638ecb] text-2xl mr-5">
+          <button className="border-0 cursor-pointer h-[45px] grid place-items-center text-[#bbb] hover:text-[#638ecb] text-2xl mr-5" onClick={() => {sendmessage()}}>
             <BiSend />
           </button>
         </div>
