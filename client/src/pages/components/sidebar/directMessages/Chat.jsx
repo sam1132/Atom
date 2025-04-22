@@ -8,7 +8,7 @@ const Chat = () => {
   const { activeChatUser } = useChat();
   const { backendUser, currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null); 
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -34,11 +34,11 @@ const Chat = () => {
   }, [activeChatUser]);
 
   const handleFileClick = (file) => {
-    setSelectedFile(file); 
+    setSelectedFile(file);
   };
 
   const closeModal = () => {
-    setSelectedFile(null); 
+    setSelectedFile(null);
   };
 
   return (
@@ -53,7 +53,14 @@ const Chat = () => {
           <div className="chat-header text-white">
             {msg.senderName}
             <time className="text-xs opacity-50 ml-2">
-              {new Date(msg.createdAt).toLocaleTimeString()}
+              {new Date(msg.createdAt).toLocaleDateString("en-US", {
+                day: "2-digit",
+                month: "2-digit",
+              })}{" "}
+              {new Date(msg.createdAt).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </time>
           </div>
           <div className="chat-bubble rounded-2xl max-w-[39%] break-words">
@@ -85,9 +92,9 @@ const Chat = () => {
       ))}
       {selectedFile && (
         <div
-        className="fixed inset-0 bg-[rgba(0,0,0,0.8)] flex items-center justify-center z-50"
-        onClick={closeModal}
-      >
+          className="fixed inset-0 bg-[rgba(0,0,0,0.8)] flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
           <div className="relative">
             <img
               src={selectedFile.fileUrl}
