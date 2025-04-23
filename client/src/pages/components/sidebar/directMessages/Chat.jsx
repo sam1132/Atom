@@ -1,14 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useChat } from "../../../../Context/ChatContext";
 import { useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../../auth/Context";
-
+import { useSocketContext } from "../../../../Context/SocketContext";
+import sound from "../../../../assets/sms.mp3"
 const Chat = () => {
   const { activeChatUser } = useChat();
   const { backendUser, currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const lastMsgRef = useRef();
+  
+  const {socket} = useSocketContext();
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("newMessage", (newMessage) => {
+      const notificationSound = new Audio(sound);
+      notificationSound.play();
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+    return () => {
+      socket.off("newMessage");
+};
+  
+  }, [socket]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (lastMsgRef.current) {
+        lastMsgRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  }, [messages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -46,6 +70,7 @@ const Chat = () => {
       {messages.map((msg, index) => (
         <div
           key={index}
+          ref={index === messages.length - 1 ? lastMsgRef : null}
           className={`chat ${
             msg.senderId === backendUser._id ? "chat-end" : "chat-start"
           }`}
@@ -56,7 +81,7 @@ const Chat = () => {
               {new Date(msg.createdAt).toLocaleDateString("en-US", {
                 day: "2-digit",
                 month: "2-digit",
-              })}{" "}
+              })}
               {new Date(msg.createdAt).toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit",

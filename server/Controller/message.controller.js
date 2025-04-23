@@ -3,6 +3,8 @@ import cloudinary from "../config/cloudinary.js";
 import { File } from "../models/File.model.js";
 import Message from "../models/message.model.js";
 import { User } from "../models/user.model.js";
+import { getReceiverSocketId,getSenderSocketId } from "../SocketIO/socketServer.js";
+import { io } from "../SocketIO/socketServer.js";
 export const sendMessage = async (req, res) => {
   const { id } = req.params;
   const { message } = req.body;
@@ -60,6 +62,14 @@ export const sendMessage = async (req, res) => {
       conversation.messages.push(newMessage._id);
     }
     await Promise.all([conversation.save(), newMessage.save()]);
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    const senderSocketId = getSenderSocketId(senderId);
+    if(receiverSocketId){
+      io.to(receiverSocketId).emit("newMessage", newMessage)
+    }
+    if(senderSocketId){
+      io.to(senderSocketId).emit("newMessage", newMessage)
+    }
     res
       .status(201)
       .json({

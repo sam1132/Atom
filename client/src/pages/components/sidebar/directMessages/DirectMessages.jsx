@@ -16,6 +16,7 @@ import { BsSearch } from "react-icons/bs";
 import { useAuth } from "../../../auth/Context";
 import axios from "axios";
 import { useChat } from "../../../../Context/ChatContext";
+import { useSocketContext } from "../../../../Context/SocketContext";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -28,25 +29,27 @@ const DirectMessages = () => {
   const [Search, setSearch] = useState("");
   const [chat, setChat] = useState([]);
   const { setActiveChatUser } = useChat();
-
+  const { socket, onlineUsers } = useSocketContext();
   useEffect(() => {
     const fetchChats = async () => {
       try {
         const token = await currentUser.getIdToken();
-        const res = await axios.get("http://localhost:3000/api/users/connections", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          "http://localhost:3000/api/users/connections",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setChat(res.data);
       } catch (error) {
         console.error("Error fetching chats:", error);
       }
     };
-  
+
     fetchChats();
   }, []);
-  
 
   const handleFind = async (e) => {
     e.preventDefault();
@@ -60,7 +63,7 @@ const DirectMessages = () => {
           },
         }
       );
-     const foundUser = response.data[0]; 
+      const foundUser = response.data[0];
 
       if (!foundUser) return;
       const res = await axios.post(
@@ -133,28 +136,46 @@ const DirectMessages = () => {
       </div>
 
       <nav className="flex flex-col w-full py-0 px-[10px] gap-[5px]">
-        {chat.map((chatItem) => (
-          <Link key={chatItem.shortId} to={`/user/message/${chatItem.shortId}`}>
-            <div
-              className="hover:bg-[#2f184b] rounded-[7.5px] transition-all duration-250 flex items-center justify-between py-0 px-[10px] w-full h-10 text-[#bbb] hover:text-[#eee] text-sm"
-              onClick={() => setActiveChatUser(chatItem)}
+        {chat.map((chatItem) => {
+          const isOnline = onlineUsers.includes(chatItem._id); // true or false
+          return (
+            <Link
+              key={chatItem.shortId}
+              to={`/user/message/${chatItem.shortId}`}
             >
-              <div className="flex items-center gap-2 cursor-pointer">
-                <img src={chatItem.avatar} className="w-6.25" alt="icon" />
-                <p className="font-semibold">
-                  {chatItem.displayName || "Unknown"}
-                </p>
+              <div
+                className="hover:bg-[#2f184b] rounded-[7.5px] transition-all duration-250 flex items-center justify-between py-0 px-[10px] w-full h-10 text-[#bbb] hover:text-[#eee] text-sm"
+                onClick={() => setActiveChatUser(chatItem)}
+              >
+                <div className="flex items-center gap-3 cursor-pointer">
+                  {/* Avatar with online status */}
+                  <div className={`avatar ${isOnline ? "online" : ""}`}>
+                    <div className="w-10 rounded-full">
+                      <img src={chatItem.avatar} alt="avatar" />
+                    </div>
+                  </div>
+
+                  {/* Display name with status dot */}
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold">
+                      {chatItem.displayName || "Unknown"}
+                    </p>
+                    {isOnline && (
+                      <span className="w-2 h-2 rounded-full bg-green-500 border-none p-0.5"></span>
+                    )}
+                  </div>
+                </div>
+                <RxCross2
+                  className="cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(true);
+                  }}
+                />
               </div>
-              <RxCross2
-                className="cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(true);
-                }}
-              />
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </nav>
 
       <Dialog
@@ -167,8 +188,8 @@ const DirectMessages = () => {
         <DialogTitle>{"Confirm User Removal"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Are you sure you want to remove this user? This action is
-            permanent and cannot be undone.
+            Are you sure you want to remove this user? This action is permanent
+            and cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
