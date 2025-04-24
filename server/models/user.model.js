@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
       default:
         "https://i.pinimg.com/236x/08/f6/4a/08f64a7cb64b67167d6b5e75429b26bb.jpg",
     },
-    connections:{
+    connections: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
@@ -38,7 +38,13 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
-    files: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }]
+    files: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }],
+    servers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Server",
+      },
+    ],
   },
   {
     timestamps: true,
