@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 
 import admin from "../config/firebase-admin.js";
 import { User } from "../models/user.model.js";
+import { deleteAccount, updateDisplayName } from "../Controller/User.controller.js";
 
 const router = express.Router();
 
@@ -94,5 +95,64 @@ router.get("/search/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+router.post("/connect", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  const { receiverId } = req.body;
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const currentUserId = decoded.uid;
+    console.log("Receiver ID:", receiverId);
+
+    const currentUser = await User.findOne({ uid: currentUserId });
+    const receiverUser = await User.findOne({ shortId: receiverId });
+    console.log(receiverUser)
+    if (!currentUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (!receiverUser) {
+      return res.status(404).json({ error: "Receiver user not found", });
+    }
+    if (!currentUser.connections.includes(receiverUser._id)) {
+      currentUser.connections.push(receiverUser._id);
+      await currentUser.save();
+    }
+    if (!receiverUser.connections.includes(currentUser._id)) {
+      receiverUser.connections.push(currentUser._id);
+      await receiverUser.save();
+    }
+
+    const populatedUser = await User.findById(currentUser._id).populate("connections");
+    res.status(200).json(populatedUser.connections);
+  } catch (err) {
+    console.error("Connect Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/connections", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const currentUserId = decoded.uid;
+
+    const currentUser = await User.findOne({ uid: currentUserId }).populate(
+      "connections",
+    );
+
+    if (!currentUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(currentUser.connections);
+  } catch (err) {
+    console.error("Connections Fetch Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch("/update/displayName", updateDisplayName);
+router.delete("/:uid", deleteAccount)
 
 export default router;

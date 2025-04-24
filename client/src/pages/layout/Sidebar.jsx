@@ -52,14 +52,24 @@ const Sidebar = () => {
           <FaPlus />
         </button>
         {/* <Tooltip position="right" text="Discover"> */}
-        <img
-          src="/image.png"
-          alt="atom logo"
-          className="w-[45px] h-[45px] border-0 opacity-67.5 rounded-[17.5px] cursor-pointer object-cover transition-all duration-250 bg-[#2f184b]/37.5 hover:bg-[#2f184b] hover:opacity-100"
-          onClick={() => {
-            handleIconClick("serverDropdown");
-          }}
-        />
+        <div className="flex flex-col items-center w-full gap-2.5 overflow-y-auto [&::-webkit-scrollbar]:hidden">
+          <img
+            src="/image.png"
+            alt="atom logo"
+            className="w-[45px] h-[45px] border-0 opacity-67.5 rounded-[17.5px] cursor-pointer object-cover transition-all duration-250 bg-[#2f184b]/37.5 hover:bg-[#2f184b] hover:opacity-100"
+            onClick={() => {
+              handleIconClick("serverDropdown");
+            }}
+          />
+          <img
+            src="/image.png"
+            alt="atom logo"
+            className="w-[45px] h-[45px] border-0 opacity-67.5 rounded-[17.5px] cursor-pointer object-cover transition-all duration-250 bg-[#2f184b]/37.5 hover:bg-[#2f184b] hover:opacity-100"
+            onClick={() => {
+              handleIconClick("serverDropdown");
+            }}
+          />
+        </div>
         {/* </Tooltip> */}
         <div className="mt-auto mb-[15px]">
           <img

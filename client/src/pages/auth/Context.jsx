@@ -9,6 +9,9 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  deleteUser,
 } from "firebase/auth";
 
 const AuthContext = createContext();
@@ -98,6 +101,41 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const reauthenticate = async (password) => {
+    try {
+      const credential = EmailAuthProvider.credential(
+        currentUser.email,
+        password
+      );
+      await reauthenticateWithCredential(currentUser, credential);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const deleteUserAccount = async (password) => {
+    try {
+      await reauthenticate(password);
+      await deleteUser(currentUser);
+      const deleteRes = await fetch(
+        `http://localhost:3000/api/users/${currentUser.uid}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${await currentUser.getIdToken()}`,
+          },
+        }
+      );
+      if (!deleteRes.ok) throw new Error("Failed to delete account");
+      setCurrentUser(null);
+      setBackendUser(null);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -110,7 +148,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = {
-    currentUser,
+    currentUser, 
+    // what is the current user in firebase it is not the backend user  it is not giving the 
+    // mongo object id and other details and also it is not the upadted user
     backendUser,
     setBackendUser,
     signup,
@@ -119,6 +159,8 @@ export function AuthProvider({ children }) {
     resetPassword,
     googleSignIn,
     githubSignIn,
+    reauthenticate,
+    deleteUserAccount,
   };
 
   return (
