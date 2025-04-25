@@ -104,6 +104,7 @@ const Chat = () => {
                     <a
                       href={file.fileUrl}
                       target="_blank"
+                      download={file.originalName}
                       rel="noopener noreferrer"
                       className="text-blue-500 underline mt-2 block"
                     >
