@@ -14,8 +14,9 @@ router.post("/", upload.single("image"), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No image uploaded" });
     }
+    const folder = req.query.folder || "atom-avatars";
     const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "atom-avatars" },
+      { folder },
       (error, result) => {
         if (error) {
           console.error("Cloudinary upload error:", error);
@@ -30,4 +31,5 @@ router.post("/", upload.single("image"), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 export default router;

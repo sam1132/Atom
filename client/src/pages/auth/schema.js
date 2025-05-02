@@ -37,3 +37,20 @@ export const ResetSchema = z.object({
     message: "Email is required",
   }),
 });
+
+export const ServerSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "At least 3 characters" })
+    .max(20, { message: "At most 20 characters" }),
+});
+
+export const ChannelSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "At least 3 characters" })
+    .max(20, { message: "At most 20 characters" })
+    .regex(/^[a-z-]+$/, {
+      message: "Only lowercase letters and hyphens allowed",
+    }),
+});

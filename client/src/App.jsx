@@ -18,6 +18,11 @@ import Planner from "./pages/components/sidebar/userDashboard/Planner";
 import { ProtectedProfileRoute } from "./pages/auth/ProtectedProfileRoute";
 import { ProtectedAuthRoute } from "./pages/auth/ProtectedAuthRoute";
 import Resources from "./pages/components/sidebar/userDashboard/Resources";
+import Server from "./pages/components/sidebar/servers/Server";
+import AudioChannel from "./pages/components/sidebar/servers/channels/AudioChannel";
+import TextChannel from "./pages/components/sidebar/servers/channels/TextChannel";
+import VideoChannel from "./pages/components/sidebar/servers/channels/VideoChannel";
+import ServerLanding from "./pages/components/sidebar/servers/ServerLanding";
 
 function App() {
   return (
@@ -40,6 +45,13 @@ function App() {
                 <Route index element={<Explore />} />
                 <Route path="message/:shortId" element={<Message />} />
                 <Route path="discover" element={<DiscoverServer />} />
+                <Route path="server/:serverId" element={<Server />}>
+                  <Route index element={<ServerLanding />} />
+                  <Route path="text/:channelId" element={<TextChannel />} />
+                  <Route path="audio/:channelId" element={<AudioChannel />} />
+                  <Route path="video/:channelId" element={<VideoChannel />} />
+                </Route>
+
                 <Route path="settings" element={<Settings />} />
                 <Route path="resources" element={<Resources />} />
                 <Route path="docket" element={<Docket />} />

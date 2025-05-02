@@ -2,26 +2,24 @@ import { User } from "../models/user.model.js";
 import admin from "../config/firebase-admin.js";
 
 export const updateDisplayName = async (req, res) => {
+  const { uid } = req.params;
   const token = req.headers.authorization?.split(" ")[1];
-  const displayName = req.body.displayName;
   try {
     const decoded = await admin.auth().verifyIdToken(token);
-    if (!decoded) {
-      return res.status(401).json({ error: "Unauthorized user" });
-    }
-    const uid = decoded.uid;
-    const user = await User.findOneAndUpdate(
-      { uid },
-      { displayName },
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    return res.status(200).json(user);
+    if (decoded.uid !== uid)
+      return res.status(401).json({ error: "Unauthorized" });
+    const user = await User.findOne({ uid }).populate({
+      path: "servers",
+      select: "name icon banner owner",
+      populate: {
+        path: "owner",
+        select: "displayName avatar",
+      },
+    });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.status(200).json(user);
   } catch (err) {
-    console.error("API /api/users/:uid error:");
-    return res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 

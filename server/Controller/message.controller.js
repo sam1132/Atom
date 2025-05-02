@@ -36,7 +36,9 @@ export const sendMessage = async (req, res) => {
           const uploadResult = await cloudinary.uploader.upload(file.path, {
             folder: "chat_files",
           });
-
+//But cloudinary.uploader.upload() is primarily meant for images and videos. 
+// When you try to upload a .docx, Cloudinary doesn't recognize it as valid media and 
+// might throw the ZIP-related error internally (since .docx is technically a ZIP-based format).
           const savedFile = await File.create({
             senderId,
             fileType: file.mimetype,
@@ -44,11 +46,10 @@ export const sendMessage = async (req, res) => {
             originalName: file.originalname,
             size: file.size,
           });
-
           return savedFile._id;
         })
       );
-
+      
       fileIds = uploads;
     }
     const newMessage = new Message({
@@ -57,18 +58,18 @@ export const sendMessage = async (req, res) => {
       message,
       files: fileIds,
     });
-    console.log("NewMessage", newMessage);  
     if (newMessage) {
       conversation.messages.push(newMessage._id);
     }
     await Promise.all([conversation.save(), newMessage.save()]);
     const receiverSocketId = getReceiverSocketId(receiverId);
     const senderSocketId = getSenderSocketId(senderId);
+    const populatedMessage = await Message.findById(newMessage._id).populate('files')
     if(receiverSocketId){
-      io.to(receiverSocketId).emit("newMessage", newMessage)
+      io.to(receiverSocketId).emit("newMessage", populatedMessage)
     }
     if(senderSocketId){
-      io.to(senderSocketId).emit("newMessage", newMessage)
+      io.to(senderSocketId).emit("newMessage", populatedMessage)
     }
     res
       .status(201)
