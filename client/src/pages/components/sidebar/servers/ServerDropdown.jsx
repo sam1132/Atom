@@ -1,10 +1,11 @@
-import { Link, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-
+import { Link, useParams,useNavigate } from "react-router-dom";
+import { useState, useEffect, } from "react";
+import axios from "axios";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { LuCircleFadingPlus } from "react-icons/lu";
 import { PiGear } from "react-icons/pi";
 import { RiArrowDownSLine } from "react-icons/ri";
+import toast from "react-hot-toast";
 import {
   TbDoorExit,
   TbHash,
@@ -19,7 +20,7 @@ import { useAuth } from "../../../auth/Context";
 
 const ServerDropdown = () => {
   const { serverId } = useParams();
-  const { backendUser } = useAuth();
+  const { backendUser,updateBackendUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [userRole, setUserRole] = useState("GUEST");
   const [serverName, setServerName] = useState("Server Name");
@@ -27,6 +28,8 @@ const ServerDropdown = () => {
   const [showInvitePeople, setShowInvitePeople] = useState(false);
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServerData = async () => {
@@ -109,8 +112,35 @@ const ServerDropdown = () => {
 
     return options;
   };
+  const handleServerDeleted = (deletedServerId) => {
+  updateBackendUser({
+    servers: backendUser?.servers.filter(
+      (server) => server._id !== deletedServerId
+    ),
+  });
+};
+console.log(serverId);
+  const handleServerDelete = async () => {
+  try {
+    const token = await currentUser.getIdToken();
+    const res = await axios.delete(`http://localhost:3000/api/servers/delete/${serverId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, 
+      },
+    });
+    console.log(res);
 
-  const handleServerDelete = {};
+    if (res.status === 200) {
+      handleServerDeleted(serverId);
+      console.log("if block")
+      navigate("/user/discover");
+      toast.success("Server deleted successfully");
+    }
+  } catch (err) {
+    console.error("Error deleting server:", err);
+    toast.error("Failed to delete server frontend");
+  }
+};
   return (
     <div>
       <div
@@ -179,16 +209,18 @@ const ServerDropdown = () => {
           );
         })}
       </nav>
-      <button
-        disabled={loading}
-        onClick={handleServerDelete}
-        className="mt-[48rem]  md:mt-[36.4rem] hover:bg-red-900/25 rounded transition-all duration-250 flex  items-center justify-between py-0 px-[20px] w-full h-10 cursor-pointer text-red-600/75 hover:text-red-600"
-      >
-        <p className="text-sm font-semibold">
-          {loading ? "Deleting server..." : "Delete Server"}
-        </p>
-        <TbDoorExit className="text-xl" />
-      </button>
+      {userRole === "ADMIN" && (
+        <button
+          disabled={loading}
+          onClick={handleServerDelete}
+          className="mt-[48rem]  md:mt-[36.4rem] hover:bg-red-900/25 rounded transition-all duration-250 flex  items-center justify-between py-0 px-[20px] w-full h-10 cursor-pointer text-red-600/75 hover:text-red-600"
+        >
+          <p className="text-sm font-semibold">
+            {loading ? "Deleting server..." : "Delete Server"}
+          </p>
+          <TbDoorExit className="text-xl" />
+        </button>
+      )}
     </div>
   );
 };
