@@ -23,7 +23,7 @@ import AudioChannel from "./pages/components/sidebar/servers/channels/AudioChann
 import TextChannel from "./pages/components/sidebar/servers/channels/TextChannel";
 import VideoChannel from "./pages/components/sidebar/servers/channels/VideoChannel";
 import ServerLanding from "./pages/components/sidebar/servers/ServerLanding";
-
+import LandingPage from "./pages/layout/LandingPage";
 function App() {
   return (
     <div className="bg-[#150A26] p-[12.5px] h-screen">
@@ -35,7 +35,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-
+            <Route path="/" element={<LandingPage />} />
             <Route element={<ProtectedAuthRoute />}>
               <Route path="/setup-profile" element={<SetupProfile />} />
             </Route>
