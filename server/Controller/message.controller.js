@@ -41,6 +41,7 @@ export const sendMessage = async (req, res) => {
 // might throw the ZIP-related error internally (since .docx is technically a ZIP-based format).
           const savedFile = await File.create({
             senderId,
+            receiverId,
             fileType: file.mimetype,
             fileUrl: uploadResult.secure_url,
             originalName: file.originalname,

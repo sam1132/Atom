@@ -100,7 +100,12 @@ export function AuthProvider({ children }) {
       throw error;
     }
   }
-
+  const updateBackendUser = async (updatedUser) => {
+    setBackendUser((prev)=>({
+      ...prev,
+      ...updatedUser,
+    }));
+  }
   const reauthenticate = async (password) => {
     try {
       const credential = EmailAuthProvider.credential(
@@ -153,6 +158,7 @@ export function AuthProvider({ children }) {
     // mongo object id and other details and also it is not the upadted user
     backendUser,
     setBackendUser,
+    updateBackendUser,
     signup,
     login,
     logout,

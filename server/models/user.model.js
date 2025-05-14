@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
-    files: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }],
+    // files: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }],
     servers: [
       {
         type: mongoose.Schema.Types.ObjectId,

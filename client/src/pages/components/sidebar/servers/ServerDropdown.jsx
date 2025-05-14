@@ -26,6 +26,7 @@ const ServerDropdown = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInvitePeople, setShowInvitePeople] = useState(false);
   const [channels, setChannels] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchServerData = async () => {
@@ -109,6 +110,7 @@ const ServerDropdown = () => {
     return options;
   };
 
+  const handleServerDelete = {};
   return (
     <div>
       <div
@@ -177,6 +179,16 @@ const ServerDropdown = () => {
           );
         })}
       </nav>
+      <button
+        disabled={loading}
+        onClick={handleServerDelete}
+        className="mt-[48rem]  md:mt-[36.4rem] hover:bg-red-900/25 rounded transition-all duration-250 flex  items-center justify-between py-0 px-[20px] w-full h-10 cursor-pointer text-red-600/75 hover:text-red-600"
+      >
+        <p className="text-sm font-semibold">
+          {loading ? "Deleting server..." : "Delete Server"}
+        </p>
+        <TbDoorExit className="text-xl" />
+      </button>
     </div>
   );
 };
