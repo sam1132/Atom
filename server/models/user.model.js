@@ -45,6 +45,12 @@ const userSchema = new mongoose.Schema(
         ref: "Server",
       },
     ],
+    todos: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Todo",
+      },
+    ],
   },
   {
     timestamps: true,

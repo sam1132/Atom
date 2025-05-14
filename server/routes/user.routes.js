@@ -3,7 +3,10 @@ import { nanoid } from "nanoid";
 
 import admin from "../config/firebase-admin.js";
 import { User } from "../models/user.model.js";
-import { deleteAccount, updateDisplayName } from "../Controller/User.controller.js";
+import {
+  deleteAccount,
+  updateDisplayName,
+} from "../Controller/User.controller.js";
 
 const router = express.Router();
 
@@ -25,10 +28,15 @@ router.post("/", async (req, res) => {
       };
       const options = { upsert: true, new: true, setDefaultsOnInsert: true };
       try {
-        user = await User.findOneAndUpdate(filter, update, options).populate({
-          path: "servers",
-          select: "name icon",
-        });
+        user = await User.findOneAndUpdate(filter, update, options)
+          .populate({
+            path: "servers",
+            select: "name icon",
+          })
+          .populate({
+            path: "todos",
+            select: "task isCompleted",
+          });
         duplicateShortId = false;
       } catch (error) {
         if (error.code === 11000 && error.keyPattern.shortId) {
@@ -82,9 +90,7 @@ router.get("/search/:id", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized user" });
     }
     const users = await User.find({
-      $or: [
-        { shortId: { $regex: id, $options: "i" } },
-      ],
+      $or: [{ shortId: { $regex: id, $options: "i" } }],
     }).limit(10);
     res.status(200).json(users);
   } catch (err) {
@@ -103,12 +109,12 @@ router.post("/connect", async (req, res) => {
 
     const currentUser = await User.findOne({ uid: currentUserId });
     const receiverUser = await User.findOne({ shortId: receiverId });
-    console.log(receiverUser)
+    console.log(receiverUser);
     if (!currentUser) {
       return res.status(404).json({ error: "User not found" });
     }
     if (!receiverUser) {
-      return res.status(404).json({ error: "Receiver user not found", });
+      return res.status(404).json({ error: "Receiver user not found" });
     }
     if (!currentUser.connections.includes(receiverUser._id)) {
       currentUser.connections.push(receiverUser._id);
@@ -119,7 +125,9 @@ router.post("/connect", async (req, res) => {
       await receiverUser.save();
     }
 
-    const populatedUser = await User.findById(currentUser._id).populate("connections");
+    const populatedUser = await User.findById(currentUser._id).populate(
+      "connections"
+    );
     res.status(200).json(populatedUser.connections);
   } catch (err) {
     console.error("Connect Error:", err);
@@ -135,7 +143,7 @@ router.get("/connections", async (req, res) => {
     const currentUserId = decoded.uid;
 
     const currentUser = await User.findOne({ uid: currentUserId }).populate(
-      "connections",
+      "connections"
     );
 
     if (!currentUser) {
@@ -150,6 +158,6 @@ router.get("/connections", async (req, res) => {
 });
 
 router.patch("/update/displayName", updateDisplayName);
-router.delete("/:uid", deleteAccount)
+router.delete("/:uid", deleteAccount);
 
 export default router;

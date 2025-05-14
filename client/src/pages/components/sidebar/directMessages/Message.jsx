@@ -126,9 +126,9 @@ const Message = () => {
             </button>
           )}
           {/*call end*/}
-          <button className="border-0 cursor-pointer w-[45px] h-[45px] grid place-items-center text-[#bbb] hover:text-[#eee] text-2xl">
+          {/* <button onclick={<VideoChannel/>} className="border-0 cursor-pointer w-[45px] h-[45px] grid place-items-center text-[#bbb] hover:text-[#eee] text-2xl">
             <TbVideoFilled />
-          </button>
+          </button> */}
           {/* Video end */}
         </div>
       </div>
