@@ -91,7 +91,7 @@ const Docket = () => {
         <div className="flex items-center h-[45px] shrink-0 text-xs font-bold text-[#aaa] uppercase">
           Docket
         </div>
-        <div className="h-[37.5px] max-[475px]:w-[125px] rounded-[7.5px] bg-[#2f184b]/37.5 border-[1px] border-[#2f184b]/75 flex items-center overflow-hidden">
+        {/* <div className="h-[37.5px] max-[475px]:w-[125px] rounded-[7.5px] bg-[#2f184b]/37.5 border-[1px] border-[#2f184b]/75 flex items-center overflow-hidden">
           <div className="border-0 h-[37.5px] w-[37.5px] shrink-0 grid place-items-center text-[#bbb] text-sm">
             <BsSearch />
           </div>
@@ -100,7 +100,7 @@ const Docket = () => {
             className="flex-1 py-3 border:none focus:outline-none text-sm font-normal text-[#eee] bg-transparent"
             placeholder="Search..."
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="relative flex flex-col items-center justify-center p-[15px] min-h-[125px] w-full rounded-[10px] bg-fuchsia-950/75">

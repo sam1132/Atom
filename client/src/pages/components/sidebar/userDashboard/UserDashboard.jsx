@@ -53,12 +53,12 @@ const UserDashboard = () => {
           <BsCalendar2Day className="text-lg" />
         </div>
       </Link>
-      <Link to="/user/mind-muffins">
+      {/* <Link to="/user/mind-muffins">
         <div className="hover:bg-[#2f184b] rounded-[7.5px] transition-all duration-250 flex items-center justify-between py-0 px-[10px] w-full h-10 cursor-pointer text-[#bbb] hover:text-[#eee]">
           <p className="text-sm font-semibold">Mind Muffins</p>
           <CgNotes className="text-xl" />
         </div>
-      </Link>
+      </Link> */}
       {currentUser && (
         <button
           disabled={loading}

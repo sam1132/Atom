@@ -10,7 +10,6 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import User from "./pages/layout/User";
 import Message from "./pages/components/sidebar/directMessages/Message";
 import Settings from "./pages/components/sidebar/userDashboard/Settings";
-import MindMuffins from "./pages/components/sidebar/userDashboard/MindMuffins";
 import DiscoverServer from "./pages/components/sidebar/DiscoverServer";
 import Docket from "./pages/components/sidebar/userDashboard/Docket";
 import Planner from "./pages/components/sidebar/userDashboard/Planner";
@@ -55,7 +54,6 @@ function App() {
                 <Route path="resources" element={<Resources />} />
                 <Route path="docket" element={<Docket />} />
                 <Route path="planner" element={<Planner />} />
-                <Route path="mind-muffins" element={<MindMuffins />} />
               </Route>
             </Route>
           </Routes>
