@@ -8,7 +8,6 @@ import SetupProfile from "./pages/auth/SetupProfile";
 import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import User from "./pages/layout/User";
-import Explore from "./pages/components/Explore";
 import Message from "./pages/components/sidebar/directMessages/Message";
 import Settings from "./pages/components/sidebar/userDashboard/Settings";
 import MindMuffins from "./pages/components/sidebar/userDashboard/MindMuffins";
@@ -42,7 +41,7 @@ function App() {
 
             <Route element={<ProtectedProfileRoute />}>
               <Route path="/user" element={<User />}>
-                <Route index element={<Explore />} />
+                <Route index element={<DiscoverServer />} />
                 <Route path="message/:shortId" element={<Message />} />
                 <Route path="discover" element={<DiscoverServer />} />
                 <Route path="server/:serverId" element={<Server />}>

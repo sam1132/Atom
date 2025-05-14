@@ -8,14 +8,19 @@ export const updateDisplayName = async (req, res) => {
     const decoded = await admin.auth().verifyIdToken(token);
     if (decoded.uid !== uid)
       return res.status(401).json({ error: "Unauthorized" });
-    const user = await User.findOne({ uid }).populate({
-      path: "servers",
-      select: "name icon banner owner",
-      populate: {
-        path: "owner",
-        select: "displayName avatar",
-      },
-    });
+    const user = await User.findOne({ uid })
+      .populate({
+        path: "servers",
+        select: "name icon banner owner",
+        populate: {
+          path: "owner",
+          select: "displayName avatar",
+        },
+      })
+      .populate({
+        path: "todos",
+        select: "task isCompleted",
+      });
     if (!user) return res.status(404).json({ error: "User not found" });
     res.status(200).json(user);
   } catch (err) {
