@@ -6,8 +6,12 @@ import { Channel } from "../models/channel.model.js";
 import { Member } from "../models/member.model.js";
 import { Server } from "../models/server.model.js";
 import { User } from "../models/user.model.js";
+import { authMiddleware } from "../Middleware/authMiddleware.js";
+import { DeleteServer } from "../Controller/server.controller.js";
 
 const router = express.Router();
+
+router.delete("/delete/:serverId", authMiddleware, DeleteServer);
 
 router.get("/", async (req, res) => {
   try {

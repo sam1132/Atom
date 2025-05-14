@@ -8,6 +8,11 @@ const fileSchema = new mongoose.Schema({
     ref:User,
     required: true,
   },
+  receiverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:User,
+    required: true,
+  },
   fileType: {
     type: String,
     required: true,

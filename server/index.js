@@ -10,6 +10,7 @@ import memberRouter from "./routes/member.routes.js";
 import serverRouter from "./routes/server.routes.js";
 import messageRouter from "./routes/message.routes.js";
 import upload from "./Middleware/multerUpload.js";
+import fileRouter from "./routes/file.routes.js";
 import { app,server } from "./SocketIO/socketServer.js";
 dotenv.config({ path: "./.env" });
 
@@ -25,6 +26,7 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/message",upload.array('files'), messageRouter);
 app.use("/api/servers", serverRouter);
 app.use("/api/members", memberRouter);
+app.use("/api/files", fileRouter);
 
 server.listen(port, () => {
   console.log(`Server running on port ${port}.`);

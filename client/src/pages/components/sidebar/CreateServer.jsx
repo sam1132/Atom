@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useRef, useState } from "react";
+import { useRef, useState,useEffect} from "react";
 import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -9,7 +9,7 @@ import { RxCross2 } from "react-icons/rx";
 import { ServerSchema } from "../../auth/schema";
 import { useAuth } from "../../auth/Context";
 
-const CreateServer = ({ onClose }) => {
+const CreateServer = ({ onClose,onServerCreated }) => {
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [iconPreview, setIconPreview] = useState(
@@ -89,6 +89,11 @@ const CreateServer = ({ onClose }) => {
         const errorData = await serverRes.json();
         throw new Error(errorData.error || "Server creation failed");
       }
+
+      const newServer = await serverRes.json();
+      if(onServerCreated){
+        onServerCreated(newServer);
+      }
       onClose();
       toast.success("Server created successfully!");
     } catch (error) {
@@ -97,8 +102,7 @@ const CreateServer = ({ onClose }) => {
       setLoading(false);
     }
   };
-
-  return (
+    return (
     <div className="fixed inset-0 bg-black/25 backdrop-blur-[2.5px] flex items-center justify-center z-50">
       <div className="relative flex flex-col items-center gap-[37.5px] w-[325px] bg-neutral-950 border-[1px] border-[#2f184b]/50 rounded-[10px] p-[18.75px]">
         <RxCross2

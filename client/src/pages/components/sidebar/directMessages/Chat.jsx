@@ -97,7 +97,7 @@ const Chat = () => {
                     <img
                       src={file.fileUrl}
                       alt={file.originalName}
-                      style={{ maxWidth: "200px", cursor: "pointer" }}
+                      style={{width:"100%",height:"auto", maxWidth: "200px", cursor: "pointer" }}
                       onClick={() => handleFileClick(file)} // Open modal on click
                     />
                   ) : (

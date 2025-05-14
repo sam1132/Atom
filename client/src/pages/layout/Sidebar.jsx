@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState,useRef,useEffect } from "react";
 
 import { FaCompass, FaPlus } from "react-icons/fa6";
 
@@ -12,11 +12,30 @@ import ServerDropdown from "../components/sidebar/servers/ServerDropdown";
 import Tooltip from "../../utils/Tooltip";
 
 const Sidebar = () => {
-  const { backendUser } = useAuth();
+  const { backendUser,updateBackendUser } = useAuth();
   const [activeComponent, setActiveComponent] = useState(null);
   const [selectedServerId, setSelectedServerId] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        activeComponent
+      ) {
+        setActiveComponent(null);
+        setSelectedServerId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeComponent]);
 
   const handleIconClick = (component) => {
     setActiveComponent((prev) => (prev === component ? null : component));
@@ -33,7 +52,11 @@ const Sidebar = () => {
       setSelectedServerId(serverId);
     }
   };
-
+  const handleServerCreated = (newserver) => {
+  updateBackendUser({
+    servers: [...(backendUser?.servers || []), newserver],  
+  });
+  }
   const componentMap = {
     directMessages: <DirectMessages />,
     serverDropdown: <ServerDropdown serverId={selectedServerId} />,
@@ -44,6 +67,7 @@ const Sidebar = () => {
 
   return (
     <div
+      ref={sidebarRef}
       className={`relative flex flex-col gap-2 w-[75px] bg-[#000000]/67.5 transition-all duration-250 ${
         isExpanded ? "w-[335px]" : ""
       } rounded-[17.5px] group overflow-hidden shrink-0`}
@@ -69,7 +93,8 @@ const Sidebar = () => {
           <FaPlus />
         </button>
         {showCreateModal && (
-          <CreateServer onClose={() => setShowCreateModal(false)} />
+          <CreateServer onClose={() => setShowCreateModal(false)}  onServerCreated={handleServerCreated} />
+          
         )}
         <div className="h-[2.5px] w-[45px] bg-white/10 rounded-full" />
         <div className="flex flex-col items-center w-full gap-2.5 overflow-y-auto [&::-webkit-scrollbar]:hidden">
