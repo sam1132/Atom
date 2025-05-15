@@ -8,7 +8,7 @@ const channelSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["TEXT", "AUDIO", "VIDEO"],
+      enum: ["TEXT", "EVENT", "VIDEO"],
       default: "TEXT",
     },
     server: {

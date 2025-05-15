@@ -17,6 +17,7 @@ import {
 import CreateChannel from "./CreateChannel";
 import InvitePeople from "./InvitePeople";
 import { useAuth } from "../../../auth/Context";
+import { FaBell } from "react-icons/fa";
 
 const ServerDropdown = () => {
   const { serverId } = useParams();
@@ -192,7 +193,7 @@ console.log(serverId);
           const Icon =
             {
               TEXT: TbHash,
-              AUDIO: HiMiniSpeakerWave,
+              EVENT: FaBell,
               VIDEO: TbVideoFilled,
             }[channel.type] || TbHash;
           return (

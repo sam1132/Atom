@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { FaBell } from "react-icons/fa";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { RxCross2 } from "react-icons/rx";
 import { TbHash, TbVideoFilled } from "react-icons/tb";
@@ -28,7 +28,7 @@ const CreateChannel = ({ onClose, serverId, onSuccess }) => {
 
   const channelIcons = {
     "text-channel": <TbHash className="text-xl text-[#bbb]" />,
-    "audio-channel": <HiMiniSpeakerWave className="text-xl text-[#bbb]" />,
+    "Event-channel": <FaBell className="text-xl text-[#bbb]" />,
     "video-channel": <TbVideoFilled className="text-xl text-[#bbb]" />,
   };
 
@@ -84,7 +84,7 @@ const CreateChannel = ({ onClose, serverId, onSuccess }) => {
             className="h-[37.5px] w-full px-2 rounded-[7.5px] bg-[#2f184b]/37.5 border-[1px] border-[#2f184b]/75 focus:outline-none text-sm font-normal text-[#eee]"
           >
             <option value="text-channel">text-channel</option>
-            <option value="audio-channel">audio-channel</option>
+            <option value="Event-channel">Event-channel</option>
             <option value="video-channel">video-channel</option>
           </select>
         </div>
