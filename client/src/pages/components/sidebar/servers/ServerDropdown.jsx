@@ -1,5 +1,5 @@
-import { Link, useParams,useNavigate } from "react-router-dom";
-import { useState, useEffect, } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { LuCircleFadingPlus } from "react-icons/lu";
@@ -21,7 +21,7 @@ import { FaBell } from "react-icons/fa";
 
 const ServerDropdown = () => {
   const { serverId } = useParams();
-  const { backendUser,updateBackendUser } = useAuth();
+  const { backendUser, updateBackendUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [userRole, setUserRole] = useState("GUEST");
   const [serverName, setServerName] = useState("Server Name");
@@ -66,6 +66,30 @@ const ServerDropdown = () => {
       action: () => setShowInvitePeople(true),
     });
 
+    const handleLeaveServer = async () => {
+      if (!window.confirm("Are you sure you want to leave this server?"))
+        return;
+      try {
+        const token = await currentUser.getIdToken();
+        const response = await fetch(
+          `http://localhost:3000/api/servers/${serverId}/leave`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to leave server");
+        }
+        window.location.href = "/user/discover";
+      } catch (error) {
+        console.error("Leave server error:", error);
+      }
+    };
+
     if (userRole === "ADMIN") {
       options.push(
         {
@@ -108,40 +132,44 @@ const ServerDropdown = () => {
         name: "Leave Server",
         icon: <TbDoorExit className="text-xl" />,
         isDanger: true,
+        action: handleLeaveServer,
       });
     }
 
     return options;
   };
   const handleServerDeleted = (deletedServerId) => {
-  updateBackendUser({
-    servers: backendUser?.servers.filter(
-      (server) => server._id !== deletedServerId
-    ),
-  });
-};
-console.log(serverId);
-  const handleServerDelete = async () => {
-  try {
-    const token = await currentUser.getIdToken();
-    const res = await axios.delete(`http://localhost:3000/api/servers/delete/${serverId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, 
-      },
+    updateBackendUser({
+      servers: backendUser?.servers.filter(
+        (server) => server._id !== deletedServerId
+      ),
     });
-    console.log(res);
+  };
+  console.log(serverId);
+  const handleServerDelete = async () => {
+    try {
+      const token = await currentUser.getIdToken();
+      const res = await axios.delete(
+        `http://localhost:3000/api/servers/delete/${serverId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(res);
 
-    if (res.status === 200) {
-      handleServerDeleted(serverId);
-      console.log("if block")
-      navigate("/user/discover");
-      toast.success("Server deleted successfully");
+      if (res.status === 200) {
+        handleServerDeleted(serverId);
+        console.log("if block");
+        navigate("/user/discover");
+        toast.success("Server deleted successfully");
+      }
+    } catch (err) {
+      console.error("Error deleting server:", err);
+      toast.error("Failed to delete server frontend");
     }
-  } catch (err) {
-    console.error("Error deleting server:", err);
-    toast.error("Failed to delete server frontend");
-  }
-};
+  };
   return (
     <div>
       <div

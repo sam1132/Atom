@@ -162,4 +162,31 @@ router.get("/:serverId/channels/:channelId", async (req, res) => {
   }
 });
 
+router.delete("/:serverId/leave", async (req, res) => {
+  const { serverId } = req.params;
+  const token = req.headers.authorization?.split(" ")[1];
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const user = await User.findOne({ uid: decoded.uid });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    const member = await Member.findOneAndDelete({ 
+      user: user._id, 
+      server: serverId 
+    });
+    if (!member) {
+      return res.status(404).json({ error: "Membership not found" });
+    }
+    await User.findByIdAndUpdate(user._id, {
+      $pull: { servers: serverId }
+    });
+    await Server.findByIdAndUpdate(serverId, {
+      $pull: { members: member._id }
+    });
+    res.status(200).json({ message: "Successfully left server" });
+  } catch (err) {
+    console.error("LEAVE SERVER ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
