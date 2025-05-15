@@ -22,6 +22,13 @@ import TextChannel from "./pages/components/sidebar/servers/channels/TextChannel
 import VideoChannel from "./pages/components/sidebar/servers/channels/VideoChannel";
 import ServerLanding from "./pages/components/sidebar/servers/ServerLanding";
 import LandingPage from "./pages/layout/LandingPage";
+import Event from "./components/home/Event";
+import Home from "./components/home/Home.jsx";
+import EventForm from "./components/Event/EventForm.jsx";
+import AddProblem from "./components/problem/AddProblem.jsx";
+import EventDetails from "./components/Event/EventDetiails.jsx";
+import ProblemDisplay from "./components/problem/ProblemDisplay.jsx";
+
 function App() {
   return (
     <div className="bg-[#150A26] p-[12.5px] h-screen">
@@ -46,8 +53,21 @@ function App() {
                 <Route path="server/:serverId" element={<Server />}>
                   <Route index element={<ServerLanding />} />
                   <Route path="text/:channelId" element={<TextChannel />} />
-                  <Route path="audio/:channelId" element={<AudioChannel />} />
                   <Route path="video/:channelId" element={<VideoChannel />} />
+
+                  <Route path="audio/:channelId" element={<Event />}>
+                    <Route index element={<Home />} />
+                    <Route path="create" element={<EventForm />} />
+                    <Route
+                      path="add-problem/:eventId/:numberOfProblems"
+                      element={<AddProblem />}
+                    />
+                    <Route path="event/:id" element={<EventDetails />} />
+                    <Route
+                      path="problem-display/:eventId"
+                      element={<ProblemDisplay />}
+                    />
+                  </Route>
                 </Route>
 
                 <Route path="settings" element={<Settings />} />
